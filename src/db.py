@@ -1,6 +1,6 @@
 import sqlite3
 
-con = sqlite3.connect("app.db")
+
 # converting the image into binary in order to store it. 
 def convertToBinaryData(filename):
     # Convert digital data to binary format
@@ -20,7 +20,7 @@ def insertBLOB(prodId, prodName, prodPrice, prodImage):
         prodTuple = (prodId, prodName, prodPrice, prodImage)
         cursor.execute(sqliteInsert, prodTuple)
         con.commit()
-        print("Image and file inserted successfully as a BLOB into a table")
+        print("the product with the {id} inserted successfully as a BLOB into a table", prodId)
         cursor.close()                                  
     except sqlite3.Error as error:
         print("Failed to insert blob data into sqlite table because", error)
@@ -29,7 +29,25 @@ def insertBLOB(prodId, prodName, prodPrice, prodImage):
             con.close()
             print("the sqlite connection is closed")
 
-insertBLOB(1, "Note 10", "1999", r"C:\Users\engan\Downloads/note10.jpg")
-
-
-
+def deleteBLOB(prodId):
+    try:
+        con = sqlite3.connect("app.db")
+        cursor = con.cursor()
+        print("Connected to sqlite server successfully")
+        exist = cursor.fetchall()
+        sqliteDelete = 'DELETE FROM Products where prodId=?'
+        cursor.execute(sqliteDelete, (prodId,))
+        if not exist:
+            print("The Id you entered doesn't exist in our records")
+            
+        else:
+            con.commit()
+            print("the product has been deleted successfully from the database")
+            cursor.close()
+       
+    except sqlite3.Error as error:
+        print("We can't proceed the deletion process because of:", error)
+    finally:
+        if con:
+            con.close()
+            print("The sqlite connection is closed")
